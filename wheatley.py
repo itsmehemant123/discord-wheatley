@@ -55,7 +55,6 @@ class Wheatley:
             batch_size += 1
             last_msg = message
             msg_set.append(message)
-            # logging.info('RECL:' + str(message.timestamp) + ' with ' + message.content)
 
         self.write_to_yaml(msg_set)
 
@@ -96,8 +95,8 @@ class Wheatley:
     async def talk(self, message):
         logging.info('MSG: ' + message.content + ' in ' + message.channel.name)
 
+        luck = random()
         if ('wheatley, do you think' in message.content.lower()):
-            luck = random()
             if (luck < 0.33):
                 await self.bot.send_message(message.channel, 'yes bby')
             elif (luck >= 0.33 and luck < 0.66):
@@ -105,7 +104,6 @@ class Wheatley:
             else:
                 await self.bot.send_message(message.channel, 'fuck no my dewd')
         else:
-            luck = random()
             if (luck > 0.33):
                 logging.info('trigerred')
                 start_time = time.time()

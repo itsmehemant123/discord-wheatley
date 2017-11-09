@@ -20,9 +20,10 @@ async def on_ready():
 
 @bot.event
 async def on_message(message):
-    if (message.author.id != bot.user.id and not message.content.startswith('!')):
-        await wheatley.talk(message)
-    else:
-        await bot.process_commands(message)
+    if (message.author.id != bot.user.id):
+        if (message.content.startswith('!')):
+            await bot.process_commands(message)
+        else:
+            await wheatley.talk(message)
 
 bot.run(auth['token'])
