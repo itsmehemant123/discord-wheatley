@@ -22,9 +22,12 @@ pip install -r requirements.txt
 {
   "database_uri": "mongodb://<uname>:<pwd>@<host>:<port>/<auth_db>",
   "database": "<db>",
-  "corpus-folder": "./corpus/"
+  "corpus-folder": "./corpus/",
+  "admin-roles": ["executives", "admins"]
 }
 ```
+
+The `admin-roles` contains the list of roles any of which can issue the `train` and `dwnld` commands.
 
 _These two files will not be tracked by git, so will not be pushed. Remove their entries from the `.gitignore` if you want otherwise._
 
@@ -69,5 +72,7 @@ Where `limit` can either be `all` - _for all messages_, or a number - _the numbe
 - Improve the chat transcript cleanup before writing to yml.
 
 - Switch mongo to mysql/postgres.
+
+- Make the role verification into a function decorator.
 
 - Make a better reply format other than alternate.

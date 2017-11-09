@@ -23,6 +23,7 @@ class Wheatley:
             self.wheatley_config = json.load(data_file)
 
         self.chatbot = ChatBot('akhrot', logic_adapters=["chatterbot.logic.BestMatch"], trainer='chatterbot.trainers.ChatterBotCorpusTrainer', storage_adapter='chatterbot.storage.MongoDatabaseAdapter', database=self.wheatley_config['database'], database_uri=self.wheatley_config['database_uri'])
+        self.admin_roles = self.wheatley_config['admin-roles']
 
     def write_to_yaml(self, messages):
         fHandle = open(self.wheatley_config['corpus-folder'] + str(time.time()) + '.yml', 'w+')
@@ -68,6 +69,9 @@ class Wheatley:
 
     @commands.command(pass_context=True, no_pm=True)
     async def dwnld(self, ctx, limit: str, channel: discord.Channel):
+        if (len(set([role.name.lower() for role in ctx.message.author.roles]).intersection(set(self.admin_roles))) == 0):
+            await self.bot.send_message(ctx.message.channel, 'Unauthorized to issue this command.')
+            return
         logging.info('issued download with: ' + limit + ', in :' + channel.name + '.')
         resp = await self.bot.send_message(ctx.message.channel, 'Downloading messages.')
         is_all = False
@@ -79,7 +83,10 @@ class Wheatley:
         await self.download_messages(channel, limit, is_all, 0, None, resp)
 
     @commands.command(pass_context=True, no_pm=True)
-    async def train(self):
+    async def train(self, ctx):
+        if (len(set([role.name.lower() for role in ctx.message.author.roles]).intersection(set(self.admin_roles))) == 0):
+            await self.bot.send_message(ctx.message.channel, 'Unauthorized to issue this command.')
+            return
         logging.info('issued train command.')
         msg_handle = await self.bot.say('Issued the train command.')
         self.chatbot.train(self.wheatley_config['corpus-folder'])
