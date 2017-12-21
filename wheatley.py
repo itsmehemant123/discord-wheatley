@@ -4,6 +4,7 @@ import sys
 import json
 import time
 import discord
+from string import ascii_letters
 from os import listdir
 from os.path import isfile, join
 from discord.ext import commands
@@ -26,17 +27,17 @@ class Wheatley:
         self.admin_roles = self.wheatley_config['admin-roles']
 
     def write_to_yaml(self, messages):
-        fHandle = open(self.wheatley_config['corpus-folder'] + str(time.time()) + '.yml', 'w+')
-        fHandle.write('categories:\n- discord-chat\nconversations:\n')
+        file_handle = open(self.wheatley_config['corpus-folder'] + str(time.time()) + '.yml', 'w+', encoding = 'utf-8')
+        file_handle.write('categories:\n- discord-chat\nconversations:\n')
         alt = True
         for message in messages:
-            msg = self.ping_replace.sub('', message.content).replace('"', "'")
+            msg = self.ping_replace.sub('', message.content).replace('"', "'").replace('\\', '\\\\') 
             if alt:
-                fHandle.write('- - "' + msg + '"\n')
+                file_handle.write('- - "' + msg + '"\n')
             else:
-                fHandle.write('  - "' + msg + '"\n')
+                file_handle.write('  - "' + msg + '"\n')
             alt = not alt
-        fHandle.close()
+        file_handle.close()
 
     async def download_messages(self, channel, limit, is_all, current_count, last_msg, msg_handle):
         before = None
@@ -96,18 +97,23 @@ class Wheatley:
         logging.info('MSG: ' + message.content + ' in ' + message.channel.name)
 
         luck = random()
-        if ('wheatley, do you think' in message.content.lower()):
+        if ('hey wheatley' in message.content.lower()):
             if (luck < 0.33):
                 await self.bot.send_message(message.channel, 'yes bby')
             elif (luck >= 0.33 and luck < 0.66):
                 await self.bot.send_message(message.channel, 'idk man')
             else:
                 await self.bot.send_message(message.channel, 'fuck no my dewd')
+        elif ('magnet' in message.content.lower()):
+            await self.bot.send_message(message.channel, ''.join(choice(ascii_letters) for x in range(15)))
         else:
             if (luck > 0.33):
                 logging.info('trigerred')
                 start_time = time.time()
-                await self.bot.send_typing(message.channel)
+                try:
+                    await self.bot.send_typing(message.channel)
+                except:
+                    pass #fuck it
                 if (message.channel.name != 'general'):
                     _, response = self.chatbot.generate_response(self.chatbot.input.process_input_statement(message.content), self.chatbot.default_session.uuid)
                 else:
