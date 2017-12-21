@@ -27,17 +27,17 @@ class Wheatley:
         self.admin_roles = self.wheatley_config['admin-roles']
 
     def write_to_yaml(self, messages):
-        fHandle = open(self.wheatley_config['corpus-folder'] + str(time.time()) + '.yml', 'w+', encoding = 'utf-8')
-        fHandle.write('categories:\n- discord-chat\nconversations:\n')
+        file_handle = open(self.wheatley_config['corpus-folder'] + str(time.time()) + '.yml', 'w+', encoding = 'utf-8')
+        file_handle.write('categories:\n- discord-chat\nconversations:\n')
         alt = True
         for message in messages:
-            msg = self.ping_replace.sub('', message.content).replace('"', "'").replace('\\', '\\\\')
+            msg = self.ping_replace.sub('', message.content).replace('"', "'").replace('\\', '\\\\') 
             if alt:
-                fHandle.write('- - "' + msg + '"\n')
+                file_handle.write('- - "' + msg + '"\n')
             else:
-                fHandle.write('  - "' + msg + '"\n')
+                file_handle.write('  - "' + msg + '"\n')
             alt = not alt
-        fHandle.close()
+        file_handle.close()
 
     async def download_messages(self, channel, limit, is_all, current_count, last_msg, msg_handle):
         before = None
