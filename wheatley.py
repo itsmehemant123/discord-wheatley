@@ -18,7 +18,7 @@ class Wheatley:
         logging.basicConfig(level=logging.INFO)
 
         self.bot = bot
-        self.ping_replace = re.compile(r"<@[0-9]{2,}>", re.IGNORECASE)
+        self.ping_replace = re.compile(r"<@![0-9]{2,}>", re.IGNORECASE)
 
         with open('./config/wheatley.json') as data_file:
             self.wheatley_config = json.load(data_file)
