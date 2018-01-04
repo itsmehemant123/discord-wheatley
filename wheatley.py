@@ -122,4 +122,5 @@ class Wheatley:
                 end_time = time.time()
                 logging.info('Time taken for response:' + str(end_time - start_time))
 
-                await self.bot.send_message(message.channel, response.text)
+                clean_msg = self.ping_replace.sub('', response.text)
+                await self.bot.send_message(message.channel, clean_msg)
