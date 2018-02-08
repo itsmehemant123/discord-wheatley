@@ -94,7 +94,7 @@ class Wheatley:
 
 
     async def talk(self, message):
-        logging.info('MSG: ' + message.content + ' in ' + message.channel.name)
+        logging.info('MSG: ' + message.content)
 
         luck = random()
         if ('hey wheatley' in message.content.lower()):
@@ -110,10 +110,21 @@ class Wheatley:
             if (luck > 0.33):
                 logging.info('trigerred')
                 start_time = time.time()
+
+
+                if (message.channel.is_private and message.author.id == '<your_id>'):
+                    logging.info('IN DMS')
+                elif (not message.channel.is_private):
+                    logging.info('IN CHANNEL:' + message.channel.name)
+                else:
+                    logging.info('UNAUTHORIZED DMS FROM:' + message.author.name + ' #' + message.author.id)
+                    return
+
                 try:
                     await self.bot.send_typing(message.channel)
                 except:
                     pass #fuck it
+
                 if (message.channel.name != 'general'):
                     _, response = self.chatbot.generate_response(self.chatbot.input.process_input_statement(message.content), self.chatbot.default_session.uuid)
                 else:
