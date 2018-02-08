@@ -31,6 +31,8 @@ The `admin-roles` contains the list of roles any of which can issue the `train` 
 
 _These two files will not be tracked by git, so will not be pushed. Remove their entries from the `.gitignore` if you want otherwise._
 
+- To restrict DMs from anyone else but you, replace the `<your_id>` at `L115` in `wheatley.py` with your discord secret id.
+
 ### How to run
 
 - Create the `corpus` folder in the project root.
