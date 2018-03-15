@@ -111,6 +111,9 @@ class Wheatley:
                 logging.info('trigerred')
                 start_time = time.time()
 
+                conv_id = self.chatbot.default_conversation_id
+                if not conv_id:
+                    conv_id = self.chatbot.storage.create_conversation()
 
                 if (message.channel.is_private and message.author.id == '<your_id>'):
                     logging.info('IN DMS')
@@ -126,7 +129,7 @@ class Wheatley:
                     pass #fuck it
 
                 if (message.channel.name != 'general'):
-                    _, response = self.chatbot.generate_response(self.chatbot.input.process_input_statement(message.content), self.chatbot.default_session.uuid)
+                    _, response = self.chatbot.generate_response(self.chatbot.input.process_input_statement(message.content), conv_id)
                 else:
                     response = self.chatbot.get_response(message.content)
 
