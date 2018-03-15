@@ -3,6 +3,7 @@ import io
 import sys
 import json
 import time
+import yaml
 import discord
 from string import ascii_letters
 from os import listdir
@@ -18,7 +19,7 @@ class Wheatley:
         logging.basicConfig(level=logging.INFO)
 
         self.bot = bot
-        self.ping_replace = re.compile(r"<@![0-9]{2,}>", re.IGNORECASE)
+        self.ping_replace = re.compile(r"<@!{0,1}[0-9]{2,}>", re.IGNORECASE)
 
         with open('./config/wheatley.json') as data_file:
             self.wheatley_config = json.load(data_file)
@@ -28,15 +29,14 @@ class Wheatley:
 
     def write_to_yaml(self, messages):
         file_handle = open(self.wheatley_config['corpus-folder'] + str(time.time()) + '.yml', 'w+', encoding = 'utf-8')
-        file_handle.write('categories:\n- discord-chat\nconversations:\n')
-        alt = True
-        for message in messages:
-            msg = self.ping_replace.sub('', message.content).replace('"', "'").replace('\\', '\\\\') 
-            if alt:
-                file_handle.write('- - "' + msg + '"\n')
-            else:
-                file_handle.write('  - "' + msg + '"\n')
-            alt = not alt
+        corpus_dict = {'categories': ['discord-chat'], 'conversations': []}
+        
+        for stim, resp in zip(messages[0::2], messages[1::2]):
+            stim = self.ping_replace.sub('', stim.content).replace('\\', '\\\\')
+            resp = self.ping_replace.sub('', resp.content).replace('\\', '\\\\')
+            corpus_dict['conversations'].append([stim, resp])
+
+        file_handle.write(yaml.dump(corpus_dict, default_flow_style=False, allow_unicode=False))
         file_handle.close()
 
     async def download_messages(self, channel, limit, is_all, current_count, last_msg, msg_handle):
@@ -59,7 +59,9 @@ class Wheatley:
 
         self.write_to_yaml(msg_set)
 
-        await self.bot.edit_message(msg_handle, 'Downloaded ' + str(current_count) + ' messages.')
+        if (current_count % 1000 == 0):
+            await self.bot.edit_message(msg_handle, 'Downloaded ' + str(current_count) + ' messages.')
+
         current_count += batch_size
         if batch_size < 100:
             await self.bot.edit_message(msg_handle, 'Finished downloading messages.')
@@ -137,4 +139,7 @@ class Wheatley:
                 logging.info('Time taken for response:' + str(end_time - start_time))
 
                 clean_msg = self.ping_replace.sub('', response.text)
-                await self.bot.send_message(message.channel, clean_msg)
+                try:
+                    await self.bot.send_message(message.channel, clean_msg)
+                except discord.errors.Forbidden as ex:
+                    logging.info(str(ex))
