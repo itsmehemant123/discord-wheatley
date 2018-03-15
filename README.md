@@ -22,8 +22,10 @@ pip install -r requirements.txt
 {
   "database_uri": "mongodb://<uname>:<pwd>@<host>:<port>/<auth_db>",
   "database": "<db>",
+  "database_type": "mongo",
   "corpus-folder": "./corpus/",
-  "admin-roles": ["executives", "admins"]
+  "admin-roles": ["executives", "admins"],
+  "max_dialog_length": 500
 }
 ```
 
