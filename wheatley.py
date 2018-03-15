@@ -49,7 +49,7 @@ class Wheatley:
 
             corpus_dict['conversations'].append([stim, resp])
 
-        file_handle.write(yaml.dump(corpus_dict, default_flow_style=False, allow_unicode=False))
+        file_handle.write(yaml.dump(corpus_dict, default_flow_style=False))
         file_handle.close()
 
     async def download_messages(self, channel, limit, is_all, current_count, last_msg, msg_handle):
