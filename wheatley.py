@@ -20,11 +20,19 @@ class Wheatley:
 
         self.bot = bot
         self.ping_replace = re.compile(r"<@!{0,1}[0-9]{2,}>", re.IGNORECASE)
-
+        
         with open('./config/wheatley.json') as data_file:
             self.wheatley_config = json.load(data_file)
 
-        self.chatbot = ChatBot('akhrot', logic_adapters=["chatterbot.logic.BestMatch"], trainer='chatterbot.trainers.ChatterBotCorpusTrainer', storage_adapter='chatterbot.storage.MongoDatabaseAdapter', database=self.wheatley_config['database'], database_uri=self.wheatley_config['database_uri'])
+        logging.info('CSTRING:' + self.wheatley_config[self.wheatley_config['database_type'] + '_database_uri'])
+
+        if (self.wheatley_config['database_type'] == "mongo"):
+            self.chatbot = ChatBot('wheatley', logic_adapters=["chatterbot.logic.BestMatch"], trainer='chatterbot.trainers.ChatterBotCorpusTrainer', storage_adapter='chatterbot.storage.MongoDatabaseAdapter',
+                                           database=self.wheatley_config['database'], database_uri=self.wheatley_config[self.wheatley_config['database_type'] + '_database_uri'])
+        elif (self.wheatley_config['database_type'] == "mysql"):
+            self.chatbot = ChatBot('wheatley', logic_adapters=["chatterbot.logic.BestMatch"], trainer='chatterbot.trainers.ChatterBotCorpusTrainer', storage_adapter='chatterbot.storage.SQLStorageAdapter',
+                                           database_uri=self.wheatley_config[self.wheatley_config['database_type'] + '_database_uri'])
+
         self.admin_roles = self.wheatley_config['admin-roles']
 
     def write_to_yaml(self, messages):
@@ -34,6 +42,11 @@ class Wheatley:
         for stim, resp in zip(messages[0::2], messages[1::2]):
             stim = self.ping_replace.sub('', stim.content).replace('\\', '\\\\')
             resp = self.ping_replace.sub('', resp.content).replace('\\', '\\\\')
+
+            if (self.wheatley_config['max_dialog_length'] is not -1):
+                stim = stim[:self.wheatley_config['max_dialog_length']]
+                resp = resp[:self.wheatley_config['max_dialog_length']]
+
             corpus_dict['conversations'].append([stim, resp])
 
         file_handle.write(yaml.dump(corpus_dict, default_flow_style=False, allow_unicode=False))
