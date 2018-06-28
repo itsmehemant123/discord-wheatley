@@ -20,7 +20,8 @@ pip install -r requirements.txt
 
 ```json
 {
-  "database_uri": "mongodb://<uname>:<pwd>@<host>:<port>/<auth_db>",
+  "mongo_database_uri": "mongodb://<uname>:<pwd>@<host>:<port>/<auth_db>",
+  "mysql_database_uri": "mysql://<uname>:<pwd>@<host>:<port>/<auth_db>",
   "database": "<db>",
   "database_type": "mongo",
   "corpus-folder": "./corpus/",
